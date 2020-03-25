@@ -3,7 +3,7 @@ from jsonmerge import merge
 import pandas as pd
 from datetime import date
 
-token='BQCp7r1TLRK_pdfqXVv3msLgTpYHTCkF4XcYHgp4zbWUh_r0o_lWxbbVindXFBxfAuFSuEsW9HagBui_6d2ckVJ5znEzBZgmVUviev5yqEASPCSSVJzngFd0NF_eh2JOUTxAIDoRQCg5djc'
+token='BQB6l5lTO0Q2cym2QQ7yfusTsm0X72HpaudWn4T7xz1-IPCvRZy5EiRPLIdbpSe9GbcziroivMfcABDhi0Yy5yuSLTM7UrZ6QYnUTWTVOr3p6r7x9NRCuEDvfaKVP59rmTu-18naHm8rXTA'
 
 def requestToServer(url):
     tokenString = 'Bearer ' + token
@@ -86,7 +86,7 @@ def export(playlistID):
         df.to_excel(writer,  sheet_name=namestr)
 
 def main():
-    playlists = ['2z29tNPUgVkSpLbz70nOSf']
+    playlists = ['37i9dQZF1Etc5ssYXmHgzg', '37i9dQZF1EtoVydsGKdS5o', '37i9dQZF1Et8POOJWXmGS1', '7sGjEQr2sgsSlCSlMk3NcA', '7xQOqbKgu1Qmu61tW3uxVo', '37i9dQZF1Ejxj76Bb3DGjr', '37i9dQZF1Eti4lqh5A1srQ', '37i9dQZF1CAsHxDwzYfpaF']
     for playlist in playlists:
         export(playlist)
 
