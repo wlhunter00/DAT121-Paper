@@ -12,7 +12,7 @@ def requestToServer(url):
     return req.json()
 
 def getPlaylistData(playlistID):
-    url = 'https://api.spotify.com/v1/playlists/' + playlistID + '/tracks?market=ES&fields=items(track(name%2Chref))&limit=25&offset=5'
+    url = 'https://api.spotify.com/v1/playlists/' + playlistID + '/tracks?market=ES&fields=items(track(name%2Chref))&offset=5'
     playlistData = requestToServer(url)
     # print(playlistData)
     songIDs = []
@@ -75,23 +75,29 @@ def getArtistInfo(songList):
 def export(playlistID):
     songList = getPlaylistData(playlistID)
     songList = [i for i in songList if i]
-    print(songList)
+    size = int(len(songList)/2)
     songList = getSongFeatures(songList)
     songList = [i for i in songList if i]
-    songList = getTrackInfo(songList)
-    songList = [i for i in songList if i]
-    songList = getArtistInfo(songList)
-    songList = [i for i in songList if i]
+    songListTemp1 = getTrackInfo(songList[0:size])
+    songListTemp1 = [i for i in songListTemp1 if i]
+    songListTemp2 = getTrackInfo(songList[size:])
+    songListTemp2 = [i for i in songListTemp2 if i]
+    songListTemp1 = getArtistInfo(songListTemp1)
+    songListTemp1 = [i for i in songListTemp1 if i]
+    songListTemp2 = getArtistInfo(songListTemp2)
+    songListTemp2 = [i for i in songListTemp2 if i]
 
+    songList = songListTemp1 + songListTemp2
     df = pd.DataFrame(songList)
     namestr = str(date.today()) + '-' + playlistID[10:]
-    with pd.ExcelWriter("C:\\Users\\wlhun\\OneDrive\\Documents\\1-Comp Sci Projects\\DAT121-Paper\\Spotify Scrape2.xlsx",
+    with pd.ExcelWriter("C:\\Users\\wlhun\\OneDrive\\Documents\\1-Comp Sci Projects\\DAT121-Paper\\Spotify Scrape3.xlsx",
                     mode='a', engine='openpyxl') as writer:
         df.to_excel(writer,  sheet_name=namestr)
 
 def main():
     # Rap, rock, edm, country, pop, jazz, r&b
-    playlists = ['37i9dQZF1DX48TTZL62Yht', '5UqaXkOQmtftgfH5yHUOaH', '37i9dQZF1DX8D2YR1GbW3K', '37i9dQZF1DWYnwbYQ5HnZU', '37i9dQZF1DXbYM3nMM0oPk', '37i9dQZF1DXbITWG1ZJKYt', '37i9dQZF1DWXnexX7CktaI']
+    # playlists = ['37i9dQZF1DX48TTZL62Yht', '5UqaXkOQmtftgfH5yHUOaH', '37i9dQZF1DX8D2YR1GbW3K', '37i9dQZF1DWYnwbYQ5HnZU', '37i9dQZF1DXbYM3nMM0oPk', '37i9dQZF1DXbITWG1ZJKYt', '37i9dQZF1DWXnexX7CktaI']
+    playlists = ['6mtYuOxzl58vSGnEDtZ9uB']
     for playlist in playlists:
         export(playlist)
 
