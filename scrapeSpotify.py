@@ -3,7 +3,7 @@ from jsonmerge import merge
 import pandas as pd
 from datetime import date
 
-token='BQB6l5lTO0Q2cym2QQ7yfusTsm0X72HpaudWn4T7xz1-IPCvRZy5EiRPLIdbpSe9GbcziroivMfcABDhi0Yy5yuSLTM7UrZ6QYnUTWTVOr3p6r7x9NRCuEDvfaKVP59rmTu-18naHm8rXTA'
+token='BQDyNEY5rC1LqTYIeK7NUMNsHT0zXDEh9RKfyOcqKpSLLVuyxkixRCsCCAJacHvcF7r01dwBU1Po72uNz4ya0RIIPcKarC9z97MVOuE2CMxuSFA_fVAj8QySsOCEpk1PkQK9unZeqJX2dNY'
 
 def requestToServer(url):
     tokenString = 'Bearer ' + token
@@ -12,8 +12,9 @@ def requestToServer(url):
     return req.json()
 
 def getPlaylistData(playlistID):
-    url = 'https://api.spotify.com/v1/playlists/' + playlistID + '/tracks?market=ES&fields=items(track(name%2Chref))'
+    url = 'https://api.spotify.com/v1/playlists/' + playlistID + '/tracks?market=ES&fields=items(track(name%2Chref))&limit=25&offset=5'
     playlistData = requestToServer(url)
+    # print(playlistData)
     songIDs = []
     for item in playlistData['items']:
         longid = item['track']['href']
@@ -23,8 +24,10 @@ def getPlaylistData(playlistID):
 
 
 def getIDList(songList , type):
+
     idList = ''
     for song in songList:
+        # print(song, type)
         idList = idList + song[type] +','
     return idList[:-1]
 
@@ -39,6 +42,7 @@ def getSongFeatures(songList):
 
 
 def getTrackInfo(songList):
+    # print(songList)
     idList = getIDList(songList, 'id')
     url = 'https://api.spotify.com/v1/tracks?ids=' + idList
     songInfo = requestToServer(url)['tracks']
@@ -70,23 +74,24 @@ def getArtistInfo(songList):
 
 def export(playlistID):
     songList = getPlaylistData(playlistID)
+    songList = [i for i in songList if i]
     print(songList)
     songList = getSongFeatures(songList)
-    size = int(len(songList)/2)
-    songListTemp1 = getTrackInfo(songList[0:size])
-    songListTemp2 = getTrackInfo(songList[size:])
-    songListTemp1 = getArtistInfo(songListTemp1)
-    songListTemp2 = getArtistInfo(songListTemp2)
+    songList = [i for i in songList if i]
+    songList = getTrackInfo(songList)
+    songList = [i for i in songList if i]
+    songList = getArtistInfo(songList)
+    songList = [i for i in songList if i]
 
-    songList = songListTemp1 + songListTemp2
     df = pd.DataFrame(songList)
     namestr = str(date.today()) + '-' + playlistID[10:]
-    with pd.ExcelWriter("C:\\Users\\wlhun\\OneDrive\\Documents\\1-Comp Sci Projects\\DAT121-Paper\\Spotify Scrape.xlsx",
+    with pd.ExcelWriter("C:\\Users\\wlhun\\OneDrive\\Documents\\1-Comp Sci Projects\\DAT121-Paper\\Spotify Scrape2.xlsx",
                     mode='a', engine='openpyxl') as writer:
         df.to_excel(writer,  sheet_name=namestr)
 
 def main():
-    playlists = ['37i9dQZF1Etc5ssYXmHgzg', '37i9dQZF1EtoVydsGKdS5o', '37i9dQZF1Et8POOJWXmGS1', '7sGjEQr2sgsSlCSlMk3NcA', '7xQOqbKgu1Qmu61tW3uxVo', '37i9dQZF1Ejxj76Bb3DGjr', '37i9dQZF1Eti4lqh5A1srQ', '37i9dQZF1CAsHxDwzYfpaF']
+    # Rap, rock, edm, country, pop, jazz, r&b
+    playlists = ['37i9dQZF1DX48TTZL62Yht', '5UqaXkOQmtftgfH5yHUOaH', '37i9dQZF1DX8D2YR1GbW3K', '37i9dQZF1DWYnwbYQ5HnZU', '37i9dQZF1DXbYM3nMM0oPk', '37i9dQZF1DXbITWG1ZJKYt', '37i9dQZF1DWXnexX7CktaI']
     for playlist in playlists:
         export(playlist)
 
